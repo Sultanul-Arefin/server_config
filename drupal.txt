@@ -1,0 +1,94 @@
+Step 1: Install Nginx HTTP Server
+apt update
+apt install nginx
+
+Step 2: Install MariaDB Server
+apt install mariadb-server mariadb-client
+
+mysql_secure_installation
+
+Step 3: Install PHP 7.1-FPM and Related Modules
+sudo apt-get install software-properties-common
+sudo add-apt-repository ppa:ondrej/php
+
+apt update
+
+sudo apt-get install php7.2-fpm php7.2-common php7.2-mbstring php7.2-xmlrpc php7.2-soap php7.2-gd php7.2-xml php7.2-intl php7.2-mysql php7.2-cli php7.2-mcrypt php7.2-tidy php7.2-recode php7.2-zip php7.2-curl
+
+nano /etc/php/7.1/fpm/php.inifile_uploads = On
+allow_url_fopen = On
+memory_limit = 256M
+upload_max_filesize = 100M
+cgi.fix_pathinfo = 0
+max_execution_time = 30
+date.timezone = America/Chicago
+
+Step 4: Create Drupal Database
+mysql
+CREATE DATABASE drupal;
+CREATE USER 'drupaluser'@'localhost' IDENTIFIED BY 'new_password_here';
+GRANT ALL PRIVILEGES ON drupal.* TO 'drupaluser'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;
+
+Step 5: Download Drupal Latest Release
+cd /tmp && wget https://ftp.drupal.org/files/projects/drupal-8.3.7.tar.gz
+
+sudo tar -zxvf drupal*.gz -C /var/www/html
+sudo mv /var/www/html/drupal-8.3.7/ /var/www/html/drupal/
+
+sudo chown -R www-data:www-data /var/www/html/
+sudo chmod -R 755 /var/www/html/
+
+Step 6: Configure Nginx
+vim /etc/nginx/sites-available/drupal
+server {
+    listen 80;
+    listen [::]:80;
+    root /var/www/html/drupal;
+    index  index.php index.html index.htm;
+    server_name  example.com www.example.com;
+
+    location / {
+    try_files $uri /index.php?$query_string;        
+    }
+
+    location @rewrite {
+               rewrite ^/(.*)$ /index.php?q=$1;
+        }
+
+    location ~ [^/]\.php(/|$) {
+         include snippets/fastcgi-php.conf;
+         fastcgi_pass unix:/var/run/php/php7.1-fpm.sock;
+         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+         include fastcgi_params;
+    }
+
+    location ~ ^/sites/.*/files/styles/ { # For Drupal >= 7
+               try_files $uri @rewrite;
+        }
+
+    location ~ ^(/[a-z\-]+)?/system/files/ { # For Drupal >= 7
+        try_files $uri /index.php?$query_string;
+        }
+}
+
+Step 7: Enable the Drupal Site
+ln -s /etc/nginx/sites-available/drupal /etc/nginx/sites-enabled/
+
+Step 8: Restart Nginx and PHP-FPM
+systemctl restart nginx.service
+systemctl restart php7.1-fpm.service
+
+##########
+-> Browse the Domain or IP, you'll se drupal site setup wizard
+##########
+
+## change the theme from -> administration-> appearances
+
+
+
+
+######### followed this:
+https://websiteforstudents.com/install-drupal-cms-on-ubuntu-18-04-lts-beta-with-nginx-mariadb-and-php-7-1-fpm-support/
+########

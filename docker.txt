@@ -1,0 +1,42 @@
+# Introduction to Docker Enterprise
+# Introduction to Docker Swarm
+
+### Installation and Configuration
+-> Upgrading the Docker Engine
+-> Selecting a Storage Driver
+-> Complete Docker Installation on Multiple platforms
+-> Configuring Logging Drivers
+-> Setting up Swarm (Managers)
+-> Setting up Swarm (Nodes)
+-> Setting up Swarm (Backup Schedules)
+-> Manage Users & Teams
+-> Troubleshoot Installation Issues
+-> Sizing Your Environment
+-> Namespaces, CGroups, and Certificates
+-> Authenticate Docker Daemon with Certificates
+-> Configuring Backups
+
+### Image Creation, Management, and Registry
+-> Understanding Dockerfile Options
+-> Dockerfile Structure
+-> Image Efficiencies in Dockerfile
+-> Manage Docker Images at the CLI
+-> Tag Images
+-> Using Registries for Image Storage
+-> Understanding Docker Image Layering
+-> Apply Files to Create Docker Images
+-> Modifying a Single Image Layer
+-> Deploy an Image Repository
+-> Configure an Image Repository for Use
+-> Searching an Image Repository
+-> Managing Images in Your Repository
+-> Deleting Images
+
+## Orchestration
+-> Setup a Swarm Cluster
+-> Containers vs. Services
+-> Locking a Swarm Cluster
+-> Creating a Swarm Service from a Container
+-> Understanding the 'docker inspect' Output
+-> Creating a Stack File Using YAML with 'docker stack deploy'
+-> Working with a Running Service Stack

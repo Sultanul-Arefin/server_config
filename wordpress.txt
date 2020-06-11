@@ -1,0 +1,163 @@
+#UPDATE SYSTEM AND LOGIN TO ROOT
+	sudo apt-get update
+	sudo -s
+
+#INSTALL NGINX AND CONFIGURE
+	apt-get install nginx-full -y			#### install nginx
+	systemctl status nginx				#### check the status
+	systemctl start nginx				#### start nginx
+							#### Started FireFox and went to 'localhost' to check if its working
+	
+#INSTALL MARIADB
+	apt-get install mariadb-server -y		#### install mariadb
+	mariadb_secure_installation			#### secure installation
+							#### setup a new password
+							#### remove anonymous users -y
+							#### disallow remote login -y
+							#### remove test db -y
+							#### reload privilege tables -y
+
+#INSTALL PHP7.3
+	add-apt-repository ppa:ondrej/php		#### get php7.3 repo
+	apt-get update					#### update repo
+	apt-get install php7.3 php7.3-fpm php7.3-mysql	#### install php7.3
+
+#CONFIGURATION FOR PHP7.3 ON NGINX
+	cp /etc/nginx/site-available/default /etc/nginx/site-available/default.bak #### take backup
+	vim /etc/nginx/site-available/default		#### edit the config file
+
+	#### CONFIG FILE ATTACHED TO BOTTOM
+
+	nginx -t					#### test the config file
+	systemctl reload nginx				#### reload nginx
+	echo "<?php phpinfo() ?>" > phpinfo.php		#### on /var/www/html to test and check version
+	rm /var/www/html/phpinfo.php
+
+#CREATE DATABASE FOR WORDPRESS
+	mariadb -u root -p
+		>CREATE DATABASE wordpress DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+		>GRANT ALL ON wordpress.* TO 'wordpress'@'localhost' IDENTIFIED BY 'wordpass';
+		>FLUSH PRIVILEGES;
+		>QUIT
+
+#INSTALL EXTRA PHP EXTENSIONS FOR WORDPRESS
+	apt-get install php7.3-curl php7.3-intl php7.3-mstring php7.3-soap php7.3-xmlrpc php7.3-zip
+	systemctl restart php7.3-fpm			#### restart fpm
+
+#CONFIGURATION FOR WORDPRESS ON NGINX
+	vim /etc/nginx/site-available/default		#### edit the config file
+
+	#### CONFIG FILE ATTACHED TO BOTTOM
+
+	nginx -t					#### test the config file
+	systemctl reload nginx				#### reload nginx
+
+#DOWNLOAD, EXTRACT AND PLACEMENT OF WORDPRESS
+
+	#Downloaded wordpress-5.3.2.tar.gz file from https://wordpress.org/download/
+
+	tar -zxvf ~/Downloads/wordpress-5.3.2.tar.gz	#### extract the archive
+	cp /wordpress/wp-config-sample.php /wordpress/wp-config.php
+	cp -R ~/Download/wordpress/. /var/www/html	#### copy everything and paste to html directory
+	chown -R www-data:www-data /var/www/html	#### set owner
+
+	#Generated secret key from https://api.wordpress.org/secret-key/1.1/salt/
+
+	vim /var/www/html/wp-config.php			#### edit config file
+
+							WP-CONFIG-FILE
+		#############################################################################################################
+			define( 'DB_NAME', 'wordpress' );
+			define( 'DB_USER', 'wordpress' );
+			define( 'DB_PASSWORD', 'wordpass' );
+			define( 'DB_HOST', 'localhost' );
+			define( 'DB_CHARSET', 'utf8' );
+			define( 'DB_COLLATE', '' );
+
+
+			define('AUTH_KEY',         'Mp2FA$e-+$BX4UlRC,REX1m(+,>[uGEqG2FT[L+*1)i(o^cd 6;i$I+M+7F+SMuC');
+			define('SECURE_AUTH_KEY',  'tnBP0!M*7&-,Qk)W{E(N+z<<t*=+2gTh~rS95Fv,XF2E?P9Y>JwbQ7Px|^`YL5Z,');
+			define('LOGGED_IN_KEY',    'ue.;A=H4u-:!~TnqqZrwAmjX;|A*EY6}<k1idUv~iC5oz71u3J{e05b|u%PEMd6.');
+			define('NONCE_KEY',        '!#9ogr#dS#a/lw1s-6(ul/u{zFSv|0+IC]UcTJzcP|OiCu&ou0K+JD/T2eeNMnwI');
+			define('AUTH_SALT',        'N! I1@@eo&>G?wL<*Ww8V+fcZ2Zr/LOWez c)/_w#I%}VFh>]ZF0YO4ue+N?BH>k');
+			define('SECURE_AUTH_SALT', 'E d~ zyYFr.!P)~0tlAl<5Q_$qR$sW^iK/w9L5{B8m>vmD$+v /W7KgXT1b+!&M]');
+			define('LOGGED_IN_SALT',   'M4QYq&,Q0o=}/A-a#^u4]7-ad8?+Wf:@7)}6F9*3dq[O9pk[&OjE&S(nnq%]5V#k');
+			define('NONCE_SALT',       'p7q +Ru2-)ZLl@5q7yW?dEC>u7~$4DF&7F9N0.y^IK:7pjmd|Q[Of&?hM)Di,?&I');
+		#############################################################################################################
+
+	systemctl reload nginx				#### reload nginx
+
+
+
+	
+
+						######## ATLAST SETUP WORDPRESS THROUGH WEB ########
+	
+
+
+
+
+
+
+
+
+
+
+`
+							CONFIG FILE
+		#################################################################################################
+			server {
+				listen 80 default_server;
+				listen [::]:80 default_server;
+				
+				root /var/www/html;
+
+				# Add index.php to the list if you are using PHP
+				index index.php index.html index.htm index.nginx-debian.html;
+
+				server_name localhost;
+
+				# Imported from https://www.nginx.com/resources/wiki/start/topics/recipes/wordpress/
+				location = /favicon.ico {
+					log_not_found off;
+					access_log off;
+				}
+
+				location = /robots.txt {
+					allow all;
+					log_not_found off;
+					access_log off;
+				}
+
+				location / {
+					# This is cool because no php is touched for static content.
+					# include the "?$args" part so non-default permalinks doesn't break when using query string
+					try_files $uri $uri/ /index.php?$args;
+				}
+
+				# pass PHP scripts to FastCGI server
+				# to process PHP content
+
+				location ~ \.php$ {
+					include snippets/fastcgi-php.conf;
+				#
+				#	# With php-fpm (or other unix sockets):
+					fastcgi_pass unix:/var/run/php/php7.3-fpm.sock;
+				#	# With php-cgi (or other tcp sockets):
+				#	fastcgi_pass 127.0.0.1:9000;
+				}
+
+				location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+					expires max;
+					log_not_found off;
+				}
+
+				# deny access to .htaccess files, if Apache's document root
+				# concurs with nginx's one
+				# 
+				location ~ /\.ht {
+					deny all;
+				}
+			}
+		############################################################################################
+

@@ -1,0 +1,103 @@
+Prerequisites: 
+PHP 5.6.19 +
+MySQL 5.6 +
+Apache
+Recommended 2GB of RAM
+
+
+Step 1: Install Apache2
+$ sudo apt install apache2
+$ sudo systemctl start apache2
+$ sudo systemctl enable apache2
+
+Step 2: New Apache Virtual Host and Configuration
+$ sudo vim /etc/apache2/sites-available/magento.conf
+
+<VirtualHost *:80>
+     ServerAdmin admin@domain.com
+     DocumentRoot /var/www/html/magento/
+     ServerName domain.com
+     ServerAlias www.domain.com
+
+     <Directory /var/www/html/magento/>
+        Options Indexes FollowSymLinks MultiViews
+        AllowOverride All
+        Order allow,deny
+        allow from all
+     </Directory>
+
+     ErrorLog ${APACHE_LOG_DIR}/magento_error.log
+     CustomLog ${APACHE_LOG_DIR}/magento_access.log combined
+</VirtualHost>
+
+Step 3: Enable Rewrite mod
+$ sudo a2ensite magento2.conf
+$ sudo a2enmod rewrite
+
+Step 4: Install PHP & dependencies
+sudo apt install php7.2 libapache2-mod-php7.2 php7.2-common php7.2-gmp php7.2-curl php7.2-soap php7.2-bcmath php7.2-intl php7.2-mbstring php7.2-xmlrpc php7.2-mcrypt php7.2-mysql php7.2-gd php7.2-xml php7.2-cli php7.2-zip
+
+-> open the /etc/php/7.2/apache2/php.ini file
+file_uploads = On
+allow_url_fopen = On
+short_open_tag = On
+memory_limit = 512M
+upload_max_filesize = 128M
+max_execution_time = 3600
+
+-> Restart Apache
+$ sudo systemctl restart apache2
+
+Step 5: Setting up MySQL Server
+$ sudo apt install mysql-server
+$ sudo mysql_secure_installation
+$ sudo mysql -u root -p
+
+mysql > create database magento;
+mysql > CREATE USER 'magentouser'@'localhost' IDENTIFIED BY 'password';
+mysql > GRANT ALL PRIVILEGES ON * . * TO 'magentouser'@'localhost';
+mysql > FLUSH PRIVILEGES;
+mysql > exit;
+
+Step 6: Install Composer
+$ php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+$ sudo php composer-setup.php --install-dir=/usr/bin/ --filename=composer
+$ composer -v
+
+Step 7: Acquire / Generate secret keys from Magento market place user account( required only for installation through composer )
+-> My Profile -> Access Keys
+
+#############
+-> Before installing magento, we must have unzip installed in system
+-> I got error because of ram, so I created 4 gb of extra swap memory
+############
+
+Step 8: Install Magento
+cd /var/www/html
+$ sudo composer create-project --repository=https://repo.magento.com/ magento/project-community-edition magento
+-> give public key as username, and the private key as the password
+
+#### I got 500 error after installation. then, I changed these:
+$ sudo chown -R www-data:www-data /var/www/html/magento
+$ sudo chmod -R 755/var/www/html/magento
+
+### for checking, 
+$ ps aux | grep apache
+$ groups <apache-user>
+
+### if still getting errors, then debug errors by referring the following logs
+$ tail -f /var/log/apache2/magento_error.log $ tail -f /var/log/apache2/magento_access.log
+
+# Step 9: Magento Setup ( Follow Step By Step UI Guidelines )
+
+### Setting Up Cron Jobs
+$ cd /var/www/html/magento $ sudo php bin/magento cron:install
+$ sudo crontab -l ( check installed magento cron jobs )
+// should find these settings in your cron
+* * * * * /usr/bin/php /var/www/html/magento/bin/magento cron:run 2>&1 | grep -v "Ran jobs by schedule" >> /var/www/html/magento/var/log/magento.cron.log  * * * * * /usr/bin/php /var/www/html/magento/update/cron.php >> /var/www/html/magento/var/log/update.cron.log  * * * * * /usr/bin/php /var/www/html/magento/bin/magento setup:cron:run >> /var/www/html/magento/var/log/setup.cron.log
+
+
+
+###############
+for installing magento, I've followed this link: https://pepipost.com/tutorials/how-to-install-magento-on-ubuntu-18-04/
+###############

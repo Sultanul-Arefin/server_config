@@ -1,0 +1,63 @@
+Step 1: Update
+$ sudo apt update -y && sudo apt upgrade -y
+
+Step 2: Install Apache and PHP 7.2 in Ubuntu
+$ sudo apt install apache2 libapache2-mod-php7.2 openssl php-imagick php7.2-common php7.2-curl php7.2-gd php7.2-imap php7.2-intl php7.2-json php7.2-ldap php7.2-mbstring php7.2-mysql php7.2-pgsql php-smbclient php-ssh2 php7.2-sqlite3 php7.2-xml php7.2-zip
+
+verify apache
+$ sudo dpkg -l apache
+
+Step 3: Install MariaDB
+$ sudo apt install mariadb-server
+$ sudo mysql_secure_installation
+
+Step 4: Create a Joomla DB
+$ mysql -u root -p
+
+MariaDB [(none)]> CREATE DATABASE joomla_db;
+MariaDB [(none)]> GRANT ALL ON joomla_db.* TO ‘joomla_user’@’localhost’ IDENTIFIED BY ‘StrongP@ssword’;
+MariaDB [(none)]> FLUSH PRIVILEGES;
+MariaDB [(none)]> EXIT;
+
+Step 5: Download Joomla
+$ sudo wget https://downloads.joomla.org/cms/joomla3/3-9-16/Joomla_3-9-16-Stable-Full_Package.zip
+$ sudo mkdir /var/www/html/joomla
+$ sudo unzip Joomla_3.19-16-Stable-Full_package.zip -d /var/www/html/joomla
+$ sudo chown -R www-data:www-data /var/www/html/joomla
+$ sudo chmod -R 755 /var/www/html/joomla
+$ sudo systemctl restart apache2
+
+Step 6: Configure Apache for Joomla
+$ sudo vim /etc/apache2/sites-available/joomla.conf
+
+<VirtualHost *:80>
+     ServerAdmin admin@example.com
+     DocumentRoot /var/www/html/joomla/
+     ServerName example.com
+     ServerAlias www.example.com
+
+     ErrorLog ${APACHE_LOG_DIR}/error.log
+     CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+     <Directory /var/www/html/joomla/>
+            Options FollowSymlinks
+            AllowOverride All
+            Require all granted
+     </Directory>
+</VirtualHost>
+
+$ sudo a2ensite joomla.conf
+$ sudo a2enmod rewrite
+
+$ sudo systemctl restart apache2
+
+Step 7: Finalizing the Joomla Installation in Ubuntu
+http:// server-IP/joomla
+
+
+# follow step by step guideline & after completing everything remove "installation folder"
+
+
+############
+followed this: https://www.tecmint.com/install-joomla-on-ubuntu/
+###########

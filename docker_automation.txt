@@ -1,0 +1,112 @@
+****Docker****
+
+# Docker is a tool designed to make it easier to deploy and run applications by using containers.
+# Container allow a developer to package up an application with all of the parts it needs, such as libraries and other dependencies, and ship it all out as one package.
+# stack ( স্তূপ, গাঁঘা )
+
+**** Docer Architecture ****
+
+# DockerFile( describes steps to create a Docker image. It's like a recipe with all ingredients and steps necessary in making your dish )
+
+--> cycle
+# Developer -> Dockerfile -> Docker Container or Docker Hub -> Pull Image from Docker Hub to different env to check
+
+# Virtualization vs Containerization
+
+Virtualization: Host OS -> Hypervisor -> Guest -> Apps
+Containerization: Host OS -> Container Engine -> lib / bins (dependencies ) -> Apps
+
+# Docker has client-server architecture
+-> cli is client -> Docker Daemon ( containers ) is the server
+-> all the components of client & server together form the docker engine
+
+# Dockerfile, Docker Image, Docker Containers, Docker Hub/Registry, Docker Client, Docker Server(Daemon), Docker Engine
+
+**** Play with Docker ****
+-> https://labs.play-with-docker.com
+
+**** Installation on Linux ****
+
+# Install from docs.docker.com
+# docker --version
+# docker info ( if docker is running, then it'll show output )
+# sudo service docker start (docker started )
+# sudo usermod -aG docker usermod ( user add to docker groupd )
+
+# docker images ( all the images )
+# docker ps ( list out running containers )
+# docker ps -a ( list out all containers )
+
+# docker run image_name (hello_world)( to run a image. if image is not available locally, it'll be pulled from repository )
+# service docker stop ( to stop docker )
+
+**** Basic Commands ****
+
+# Basic
+> docker version ( info about docker client & server )
+> docker -v
+> docker info
+> docker --help  (examples: docker images --help, docker run --help )
+> docker login ( login to hub.docker.com )
+
+# Images
+> docker images ( ls of images ) ( docker images --help )
+> docker pull ( docker pull nginx ) 
+> docker rmi ( to remove an images. docker rmi image_name or image_id )
+
+# Containers
+> docker ps ( to see running container, -a to see all containers )
+> docker run ( docker run image_name, if unable to find locally, it'll get from repo) ( docker run ubuntu )
+( docker run -it ubuntu ) ( now, go to another terminal. type docker ps, it'll show that ubuntu is running )
+> docker start ( docker start container_id )
+> docker stop ( docker stop container_id )
+
+# Systems 
+> docker stats ( details on the running container )
+> docker system df ( disk usage of docker )
+> docker system prune ( to remove unused data ) (see, docker system prune --help to more )
+-> docker system prune -a ( remove all unused container, images etc )
+
+
+**** Docer Images ****
+
+# Docker Image are templates used to create docker containers
+# Container is a running instance of image
+# Images stored in registries
+
+# docker images --help
+# docker images
+# docker pull ubuntu
+# docker pull ubuntu:18.04 ( with tags )
+# docker images -q ( give images id )
+# docker images -f "dangling=false" ( 'f' for filters, provide some filters ) ( dangling images are the images, that are associated with a container or a running container )
+# docker images -f "dangling=false" -q
+# docker run ubuntu ( by running a image, we actually create a container out of it )
+( docker run --name MyUbuntu -it ubuntu bash ) ( start a container with name )
+# docker rmi ubuntu ( remove image ) ( if used by a container, it'll be unable to delete. 1st stop the container, then remove the image )
+# docker rmi -f ubuntu ( remove forcefully )
+# docker inspect image_name | id ( to info about image )
+# note: image typically contains a union of layered filesystems stacked on top of each other )
+
+
+**** Containers ****
+
+# Containers are running instances of Docker Images
+
+> docker ps
+> docker run ImageName ( docker run hello-world )
+> docker start containerName/Id 
+> docker stop containerName/Id
+
+> docker pause containerName/Id
+> docker unpause containerName/Id
+
+> docker top containerName/Id ( top processes )
+> docker stats containerName/Id ( stats of running container )
+
+> docker attach containerName/Id ( to go inside the container )
+
+> docker kill containerName/Id ( kill container, if it's running )
+> docker rm containerName/Id ( remove container ) 
+
+> docker history ImageName/Id ( history of a particular image )

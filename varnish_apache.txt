@@ -1,0 +1,55 @@
+Step 1: Install Apache2
+sudo apt-get update
+sudo apt-get install apache2
+
+Step 2: Install Varnish
+sudo apt-get install varnish
+
+Step 3: Switch Apache2 default port to 8080
+sudo nano /etc/apache2/ports.conf
+NameVirtualHost 127.0.0.1:8080
+Listen 127.0.0.1:8080
+
+sudo nano /etc/apache2/sites-available/000-default.conf
+<VirtualHost 127.0.0.1:8080>
+
+sudo systemctl restart apache2.service
+
+Step 4: Configure Varnish to use Port 80
+sudo nano /etc/default/varnish
+
+## Alternative 2, Configuration with VCL
+#
+# Listen on port 6081, administration on localhost:6082, and forward to
+# one content server selected by the vcl file, based on the request.
+#
+DAEMON_OPTS="-a :80 \
+-T localhost:6082 \
+-f /etc/varnish/default.vcl \
+-S /etc/varnish/secret \
+-s malloc,256m"
+
+
+sudo nano /etc/varnish/default.vcl
+-> verify the line shown below is what you see.
+# Default backend definition. Set this to point to your content server.
+backend default {
+.host = "127.0.0.1";
+.port = "8080";
+}
+
+sudo systemctl restart apache2.service
+sudo systemctl restart varnish.service
+
+#########
+After these steps, it should be ok. But I had problem. So, I had to kill the process of varnishd by: ps aux | grep varnish. then kill.
+then, I ran this sudo /usr/sbin/varnishd -a :80 -b localhost:8080
+#########
+
+To Check: curl -I http://localhost
+
+
+
+#######
+Followed this: https://websiteforstudents.com/install-apache2-with-varnish-on-ubuntu-16-04-lts-server/
+#######

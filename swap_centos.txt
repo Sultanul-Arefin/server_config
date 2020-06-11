@@ -1,0 +1,26 @@
+swapon -s ( to see if swap is on)
+free -m 
+df -h
+sudo dd if=/dev/zero of=/swapfile count=4096 bs=1MiB (4 giga swap file)
+ls -lh /swapfile
+chmod 600 /swapfile
+ls -lh /swapfile
+mkswap /swapfile
+swapon /swapfile
+swapon -s
+free -m
+
+** swap file created
+***** if we reboot the system, everything will be erased
+** so, follow steps given below
+
+vim /etc/fstab
+/swapfile	swap	swap 	sw	0	0 ( add this line) ( tab, not space )
+
+vim /etc/sysctl.conf
+vm.swappiness=10 (add this line )
+vm.vfs_cache_pressure=50 ( add this line)
+
+
+
+******** add sudo, if you're not a root user

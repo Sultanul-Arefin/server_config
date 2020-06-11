@@ -1,0 +1,88 @@
+### Installation to setup password for root
+
+
+
+1. sudo apt-get update
+2. sudo apt-get install mariadb-server
+3. mysql -V
+4. sudo systemctl status mariadb
+5. sudo mysql_secure_installation
+6. sudo mysql -u root -p
+
+
+
+### Manage MySQL Database and Users
+
+
+
+1. 
+CREATE DATABASE IF NOT EXISTS my_db;
+
+2. 
+SHOW DATABASES;
+
+3. 
+DROP DATABASE IF EXISTS my_db;
+
+4. 
+CREATE USER 'db_user'@'localhost' IDENTIFIED BY 'user_password';
+Or,
+CREATE USER IF NOT EXISTS 'db_user'@'localhost' IDENTIFIED BY 'user_password';
+
+5. 
+Change a MySQL user account password for newer version
+ALTER USER 'db_user'@'localhost' IDENTIFIED BY 'new_password';
+
+6. 
+List all MySQL user accounts
+SELECT user, host FROM mysql.user;
+
+7. 
+Delete MySQL user account
+DROP USER IF EXISTS 'db_user'@'localhost';
+
+8. 
+Grand permissions to a MySQL user account
+GRANT ALL PRIVILEGES ON db_name.* TO 'db_user'@'localhost';
+
+** Grand all privileges to a user account over all databases,
+GRANT ALL PRIVILEGES ON *.* TO 'db_user'@'localhost';
+
+** Grand all privileges to a user account over a specific table from a database
+GRANT ALL PRIVILEGES ON db_name.table_name TO 'db_user'@'localhost';
+
+** specific privileges to a user account over a specific database type
+GRANT SELECT, INSERT, DELETE ON db_name.* TO db_user@'localhost';
+
+** Revoke permission is as identical to granting it
+REVOKE ALL PRIVILEGES ON db_name.* TO 'db_user'@'localhost';
+
+9. 
+Display MySQL user account privileges
+SHOW GRANTS FOR 'db_user'@'localhost';
+
+
+
+# Reset MySQL Root Password
+
+**** For changing root password, version is one of the biggest issue
+
+1. mysql --version
+
+2. sudo systemctl stop mysql
+
+3.
+Start the MySQL/MariaDB server without loading the grant tables
+sudo mysqld_safe --skip-grant-tables &
+
+4. mysql -u root
+
+5. ALTER USER 'root'@'localhost' IDENTIFIED BY 'new_password'
+
+6. FLUSH PRIVILEGES;
+
+7. mysqladmin -u root -p shutdown
+
+8. sudo systemctl start mariadb
+
+9. sudo mysql -uroot -p
