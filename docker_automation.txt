@@ -110,3 +110,51 @@ Containerization: Host OS -> Container Engine -> lib / bins (dependencies ) -> A
 > docker rm containerName/Id ( remove container ) 
 
 > docker history ImageName/Id ( history of a particular image )
+
+
+**** Run Jenkins On Docker ****
+
+# set jenkins home on Docker volume and host machine ( see later )
+
+> docker pull jenkins
+> docker run -p 8080:8080 -p 50000:50000 jenkins ( -p expose the port 8080 on the host system which corresponcse to 8080 port for the docker server ) ( exporting port 50000 for jenkins api ) ( image name is jenkins ) ( all the data will be lost when we delete the container with this command )
+
+# Persistent storage for Jenkins_Home
+> docker run -p 8080:8080 -p 50000:50000 -v /your/home:/var/jenkins_home jenkins ( --name MyJenkins1, running with a name )
+# if you stop, remove & then create this container again old file will be remain same.
+
+# docker volume create myjenkins ( to create a volume )
+# docker volume ls ( to see volumes )
+# docker volume inspect myjenkins ( details about the volume ) ( mount point is where it is available )( though, it's available in the host machine, we're not able to touch it or change any functions )
+
+# after creating volume,
+> docker run --name MyJenkins2 -p 9090:8080 -p 50000:50000 -v myjenkins:/var/jenkins_home jenkins ( giving volume name instead of physical location )
+
+# docker inspect MyJenkins2 ( details about the MyJenkins2 Container ) ( See Mounts, where type is volume & name is sultan )
+
+
+
+**** Docker File ****
+
+
+# Dockerfile: A text file with instructions to build image
+Or, Automation of Docker Image Creatin
+
+FROM
+RUN ( run gets executed during the building of the image )
+CMD ( cmd gets executed only when we create a container out of the image )
+
+Step 1:  Create a file named Dockerfile
+> mkdir Dockerfiles && cd Dockerfiles
+> touch Dockerfile
+> vim Dockerfile
+
+FROM ubuntu # first instructions a docker file starts with FROM. have to give a base image
+# If we want to create an empty image, use FROM scratch
+MAINTAINER sultan <fahimsultan4@gmail.com> # optional
+RUN apt-get update # run this command on the image
+CMD ["echo", "Hello world....!from first docker image] # if we want to run something on command line during container creation
+
+> docker build ( to build the image )
+> docker build . ( current folder )
+> docker build -t myimage1:1.0 . ( tag an image )
