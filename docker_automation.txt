@@ -245,3 +245,111 @@ services:
 # bind Mounts
 -> bind mounts means a file or directory on the host machine is mounted into a container
 -> docker run --name MyJenkins3 -v /home/sultan/Jenkins_Home:/var/jenkins_home -p 9191:8080 -p 40000:50000 jenkins ( a new instance )
+
+
+**** Docker Swarm ****
+
+# Docker Swarm
+# Why to use
+# How to create & manage docker swarm
+# create service on docker swarm
+# scaling services up and down
+# features
+
+# Docker Swarm
+> A swarm is a group of machines that are running docker and joined into a cluster.
+
+> multiple nodes ( manager, worker )
+
+> Docker Swarm is a tool for container orchestration
+
+Example:
+- We've 100 containers
+Now we need to do:
+- Health check on every container
+- Ensure all containers are up on every system
+- Scaling the containers up or down depending on the load
+- Adding updates/changes to all the containers
+
+orchestration - managing and controlling multiple docker containers as a single service
+Tools available - Docker Swarm, Kubernetes, Apache Mesos
+
+# Installation
+
+> If you're using docker on windows or mac you probably already have the docker-machine. For linux, you've to download it manually.
+
+# Create
+
+Step 1: Create Docker machines ( to act as nodes for Docker Swarm )
+Create one machine as manager, and others as worker
+-> docker-machine --help ( to see help page )
+
+> docker-machine create --driver virtualbox manager1 ( if error occurred, have to install virtualbox )
+> connect docker client to the docker engine running on this virtual machine, run: docker-machine env manager1 ( details )
+
+Step 2:
+> docker-machine ls ( list of docker machine )
+> docker-machine ip manager1 ( ip of the manager1 machine )
+
+> docker-machine create --driver virtualbox worker1 ( creating worker machine )
+> docker-machine create --driver virtualbox worker2
+
+> docker-machine ls ( total 3 machines or nodes )
+
+Step 3: SSH ( connect ) to docker machine
+> docker-machine ssh manager1
+
+Step 4: Initialize Docker Swarm ( run on the machine which we want to be manager )
+> docker swarm init --advertise-addr MANAGER_IP
+> docker node ls ( this command will work only in swarm manager and not in worker )
+( we can add more manager to the swarm )
+
+Step 5: Join workers in the swarm
+> Get command for joining as worker
+> In manager node run command
+> docker swarm join-token worker ( this will give command to join swarm as worker )
+> docker swarm join-token manager ( this will give command to join swarm as manager )
+
+> SSH into worker node ( machine ) and run command to join swarm as worker
+
+> In manager run command - docker node ls to verify worker is registered and is ready
+
+> Do this for all worker machines
+
+Step 6: On manager run standard docker command
+> docker info ( check the swarm section. no of manager, nodes etc )
+> docker swarm ( now check docker swarm command options )
+
+Step 7: Run containers on Docker Swarm
+> docker service create-replicas 3 -p 80:80 --name serviceName nginx
+
+# check the status
+> docker service ls
+> docker service ps serviceName
+( check the service running on all nodes. check on the browser by giving ip for all nodes )
+
+Step 8: Scale service up and down on manager node
+> docker service scale serviceName=4
+
+# Inspecting Nodes ( this command can run only on manager node )
+> docker node inspect nodeName
+> docker node inspect self ( if want to inspect manager itself )
+> docker node inspect worker1
+
+Step 9: Update Service
+> docker service update --image <imagename>:<version> serviceName
+> docker service update --image nginx:1.14.0 web1 ( nginx latest to 1.14.0 )
+
+Step 10: Shutdown node
+> docker node update --availability drain worker1 ( if want to shut down some particular node )
+> docker node ls ( worker1 node status will be drain )
+
+Step 11: Remove Service
+> docker service rm serviceName
+
+> docker swarm leave ( if want to leave the swarm )
+> docker-machine stop machineName ( to stop the machine | run it from machine, not from manager or worker ))
+> docker-machine rm machineName ( to remove the machine )
+
+
+A blog link on docker-swarm: https://rominirani.com/docker-swarm-tutorial-b67470cf8872
