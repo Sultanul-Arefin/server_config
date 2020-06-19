@@ -1,0 +1,54 @@
+# -> yaml is a data serialization language ( ain't a markup language )
+# -> key-value pairs( variables, lists, objects )
+# -> yaml emphasize on readbility, user friendliness than json ( json, yaml almost same )
+# -> ( .yml or .yaml )
+# -> # comments
+
+### define information about myself
+
+name: "fahim"
+occupation": 'bekar'
+age: 23
+gpa: 2.96
+male: true # boolean
+birthday: 1994-02-06 14:33:22 # ISO 8601
+flaws: null
+
+
+### inside an object
+
+person:
+  name: "fahim"
+  occupation": 'bekar'
+  age: 23
+  gpa: 2.96
+  number: !!float 1234 # render as float
+  phone: !!str 43 # render as string
+  male: true # boolean
+  birthday: 1994-02-06 14:33:22 # ISO 8601
+  flaws: null
+  hobbies:
+    - hiking
+    - movies
+    - riding bike # list items
+  movies: ["a","b","c", "good will hunting"] # hobbies, movies are equivalent. they're list
+  friends:  # list of objects
+    - name: "fahim"
+      age: 22
+    - {name: "fahim", age: 22} # same as above
+    -
+      name: "arefin"
+      age: 23 # all 3's are storing objects as list item
+  description: > # render all the file as single line.
+    Hello, abc lasjdlafda asdlfsdjfladf l;daj;fa,
+    sldfsalflaf a fsldjflsflaf fldjlfasjlfasflasjf
+    ljsdalfdflaf slfslfa aflalfeoifevn lfalsfal
+    dljfasdlfweifo jfalfjow fjdlfjowenv ldjaflalf
+  signature: |  # formatting to be preserved
+    Sultanul Arefin
+    YafiTech
+    email - fahimsultan@gmail.com
+    
+
+# -> can access by person.name
+

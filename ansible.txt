@@ -1,0 +1,100 @@
+# topics
+-> Introduction to Ansible and lab setup
+-> Ansible Inventory files
+-> Ansible Playbook
+-> Variables
+-> Conditions
+-> Loops
+-> Roles
+-> Preparing windows server
+
+# Advance topics
+-> Ansible galaxy
+-> Asynchronous action
+-> Error Handling
+-> Jinja2 templating
+-> Lookups
+-> Vaults
+-> Dynamic Inventory
+-> Custom module
+-> Plugins
+
+
+##########
+### Lab Setup
+-> ssh for linux machine
+-> winrm for windows machine
+
+-> vim /etc/ansible/hosts ( add in this file )
+192.168.122.54 ansible_ssh_pass=password
+:wq
+
+-> default user => root, connection => ssh
+
+-> host_key_checking = False ( /etc/ansible/hosts )
+
+-> sudo apt install sshpass -y
+
+## let's ping in to our ip from controller machine
+-> ansible 192.168.122.54 -m ping ( m=module )
+
+
+##### another way
+-> create a folder & file
+$ sudo vim /etc/ansible/inventory/inventory.txt
+$ vim inventory.txt
+webserver1 ansible_host=192.168.122.54 ansible_ssh_pass=password ansible_connection=ssh ansible_port=22 ansible_user=sultan
+
+## let's ping
+-> ansible webserver1 -m ping -i /etc/ansible/inventory/invetory.txt( we've define the file or path of the file )( i => changing default entry file )
+
+
+## 2 server
+
+webserver1 ansible_host=192.168.122.54 ansible_ssh_pass=password ansible_connection=ssh ansible_port=22 ansible_user=sultan
+mysqlserver1 ansible_host=192.168.122.55 ansible_ssh_pass=password ansible_connection=ssh ansible_port=22 ansible_user=sultan
+
+let's ping
+
+$ ansible mysqlserver1 -m ping -i /etc/ansible/inventory/invetory.txt( we've define the file or path of the file )( i => changing default entry file )
+
+$ ansible all -m ping -i inventory.txt
+
+$ webserver* ( with wildcard, ping all starting with webserver )
+
+##  groups
+-> add records first.
+-> then, create groups
+
+[webservers]
+webserver1
+webserver2
+webserver3
+webserver4
+
+[mysqlservers]
+mysqlserver1
+mysqlserver2
+mysqlserver3
+mysqlserver4
+
+-> ansible mysqlservers -m ping -i inventory.txt
+
+
+##############
+## Ansible playbook
+-> inventory file like above
+-> playbook
+$ vim playbook.yml
+-
+  name: this is our first play
+  hosts: webservers
+  tasks: 
+    - 
+      name: "create a dummy file on webser"
+      command: touch /tmp/ansible_dummy.txt
+
+## run a ansible playbook
+$ ansible-playbook playbook.yml -i inventory.txt ( define inventory too, cause we're not using default inventory )
+
+

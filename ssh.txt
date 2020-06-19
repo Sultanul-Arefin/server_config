@@ -1,0 +1,53 @@
+### ssh
+
+( i ) Introduction
+
+-> client comes with unix ( if not, then sudo apt-get install openssh-client )
+-> sudo apt-get install openssh-server ( for server )
+-> sudo netstat -tulpn ( it'll show connection ports we're listening to )
+-> systemctl status ssh ( start | stop | restart | enable | disable )
+-> sudo /etc/init.d/ssh status ( for a older system )
+
+( ii ) Connecting
+
+-> ip addr show | ip a
+-> ssh ip ( if username is same with current cmd username, or have to define )
+-> ssh -v ip ( debug output )
+-> ssh -p 22 ip ( if have to define port )
+
+( iii ) Basic Configuration
+
+-> ls /home/user/.ssh
+-> cat /etc/ssh/sshd_config ( ssh daemon or config file )
+-> sudo vim /etc/ssh/sshd_config
+  -> Port 2222
+  -> PermitRootLogin no ( from prohibit-password )
+  -> PasswordAuthentication ( default yes )
+  -> AllowUsers sultan ( only certain user will allow in )
+  -> AllowGroups managers ( only certain group users will allow in )
+-> sudo systemctl restart ssh
+
+( iv ) Basic Troubleshooting
+
+-> sudo tail -f /var/log/auth ( only for admin )    |    /var/log/secure for fedora, centOS, redhat
+-> ssh -v ip 
+-> suppose, a user from not allowed groups want to access. The user can't access to the server. The only option is administrative add this user to allowed groups, or remove group from AllowedGroups.
+
+( v ) Public Key Authentication
+
+-> ssh-keygen ( for creating public/private rsa key-pair )
+  -> if passphrase given, it'll prompt for every server with same password.
+-> public key relation with servers:
+  -> ssh-copy-id -i ~/.ssh/id_rsa.pub ip ( i for input file )
+  -> ssh ip ( no password required )
+  -> cat ~/.ssh/authorized_key
+-> sudo vim /etc/ssh/sshd_config
+  -> PasswordAuthentication no
+  -> After restarting ssh, no password required to login ( only users with public key can login )
+-> ssh ip ls -la ( it'll not login, just list dir )
+
+( vi ) Secure Copy ( scp )
+
+-> scp -P 2231 song.mp3 ip:/home/user/dir ( must use 'P' in scp, because 'p' is used in another task in scp )
+-> scp -r mydir user@ip: ( for directory, it's going to default home )
+-> scp -r user@ip:/home/user/dir . ( server to local )
