@@ -98,3 +98,17 @@ $ vim playbook.yml
 $ ansible-playbook playbook.yml -i inventory.txt ( define inventory too, cause we're not using default inventory )
 
 
+
+
+
+
+
+##############
+## Some Command ( suppose we've a hosts named web, db )
+$ ansible all -a 'ls -lah /'
+$ ansible web -a 'tail /var/log/auth.log'
+$ ansible all -m ping ( ping module )( ping all the servers )
+$ ansible all -m copy -a 'src=/tmp/file.txt dest=/tmp/c_file.txt' ( copy module )
+$ ansible all -m shell -a 'ls -lah /tmp' ( shell module )
+$ ansible web -b -K -m apt -a 'name=htop state=present' ( apt module ) ( state=present, installation )
+$ ansible web -b -K -m apt -a 'name=htop state=absent' ( state=absent, uninstallation )
