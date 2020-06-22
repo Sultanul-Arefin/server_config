@@ -137,3 +137,10 @@ $ ansible web -b -K -m apt -a 'name=htop state=absent' ( state=absent, uninstall
     service: 
       name: apache2
       state: restarted
+
+
+
+## first try to learn
+-> Hosts ( inventory ) setup
+-> ad-hoc ansible commands(-a "ls -lah". ad-hom command) 
+-> playbook
