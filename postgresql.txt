@@ -1,0 +1,86 @@
+##############
+USE SUDO WITH ALL CMDS
+#############
+
+###########
+PostgreSQL is RDBMS in SQL.
+
+#######
+### postgresql default port is 5432
+### by default, mysql is selected. So, change in php.ini for using postgresql ( see examples )
+
+
+##########
+
+( i ) Installation 
+
+-> apt update
+-> apt install postgresql postgresql-contrib
+-> psql -V ( to see client version of postgresql )
+
+( ii ) Using PostgresSQL Roles and Databases
+-> By default, postgres uses a concept called "roles" to handle authentication and authorization.
+-> The installation procedure created a user account called postgres that is associated with the default postgres role.
+
+# at first, we've to switch over to the postgres account
+-> sudo -i -u postgres ( we can do it directly from root )
+-> psql ( then, type psql to access the postgresSQL prompt )
+-> \q ( to exit from postgres prompt )
+
+# accessing a postgres prompt without switching accounts
+-> sudo -u postgres psql
+
+( iii ) Creating a New Role
+-> can create new role by createrole command. The --interactive flag will prompt for the name of the new role and also ask whether it should have superuser permissions.
+-> you've to logged in as postgres user
+-> createuser --interactive
+-> sudo -u postgres createuser --interactive ( If, instead, use sudo for each command without switching from normal account )
+-> see man createuser to other options
+
+( iv ) Creating a New Database
+### postgres will create database automatically when a new user is created.
+-> createdb user2 
+
+( v ) Opening a postgres prompt with the new role
+## To login with ident based authentication, we'll need a linux user with the same name as your postgres role and database.
+-> sudo adduser user1 ( suppose we've already a role named user1 )
+-> sudo -i -u user1
+-> psql
+OR,
+-> sudo -u user1 psql
+
+## If users want to connect to a different db
+-> psql -d postgres
+
+## Once you logged in, you can get check current connection information by,
+-> \conninfo
+
+( vi ) Creating & Deleting Tables
+-->CREATE TABLE playground (
+    equip_id serial PRIMARY KEY,
+    type varchar (50) NOT NULL,
+    color varchar (25) NOT NULL,
+    location varchar(25) check (location in ('north', 'south', 'west', 'east', 'northeast', 'southeast', 'southwest', 'northwest')),
+    install_date date
+);
+# serial type, which is an auto-incrementing integer. This column also has the constraint of PRIMARY KEY
+
+-> \d ( to see the table, it'll show the sequence too )
+-> \dt ( to see the table without the sequence )
+
+( vii ) Adding, Querying, and Deleting Data in a Table
+-> INSERT INTO playground (type, color, location, install_date) VALUES ('slide', 'blue', 'south', '2017-04-28');
+-> SELECT * FROM playground;
+-> DELETE FROM playground WHERE type = 'slide';
+
+( viii ) Adding, and Deleting Columns from a Table
+-> ALTER TABLE playground ADD last_maint date; ( adding column )
+-> ALTER TABLE playground DROP last_maint; ( deleting column )
+
+( ix ) Updating Data in a Table
+-> UPDATE playground SET color = 'red' WHERE type = 'swing';
+
+
+
+############# learned from
+https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-20-04
