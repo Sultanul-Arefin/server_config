@@ -112,3 +112,28 @@ $ ansible all -m copy -a 'src=/tmp/file.txt dest=/tmp/c_file.txt' ( copy module 
 $ ansible all -m shell -a 'ls -lah /tmp' ( shell module )
 $ ansible web -b -K -m apt -a 'name=htop state=present' ( apt module ) ( state=present, installation )
 $ ansible web -b -K -m apt -a 'name=htop state=absent' ( state=absent, uninstallation )
+
+### installing apache2 in debina
+--- # Infrastructure demo
+- hosts: ubuntu
+  remote_user: sultan
+  become: yes
+  become_method: sudo
+  connection: ssh
+  gather_facts: yes
+  vars: 
+    username: sultan
+
+  tasks:
+  - name: Install apache service on all instalnce that belong to ubuntu group
+    apt:
+      name: apache2
+      state: latest
+    notify:
+    - start apache2 service
+
+  handlers:
+  - name: start apache2 service
+    service: 
+      name: apache2
+      state: restarted
