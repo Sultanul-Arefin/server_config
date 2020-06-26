@@ -85,6 +85,7 @@
 			define('NONCE_SALT',       'p7q +Ru2-)ZLl@5q7yW?dEC>u7~$4DF&7F9N0.y^IK:7pjmd|Q[Of&?hM)Di,?&I');
 		#############################################################################################################
 
+## Give Database Information in wp-config.php
 	systemctl reload nginx				#### reload nginx
 
 
@@ -160,4 +161,10 @@
 				}
 			}
 		############################################################################################
+
+
+Can follow:
+https://www.rosehosting.com/blog/how-to-install-wordpress-with-a-lemp-stack-on-ubuntu-18-04/
+&
+https://www.digitalocean.com/community/tutorials/how-to-install-wordpress-with-lemp-on-ubuntu-18-04
 
