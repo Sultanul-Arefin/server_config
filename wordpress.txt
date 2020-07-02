@@ -10,7 +10,7 @@
 	
 #INSTALL MARIADB
 	apt-get install mariadb-server -y		#### install mariadb
-	mariadb_secure_installation			#### secure installation
+	mysql_secure_installation			#### secure installation
 							#### setup a new password
 							#### remove anonymous users -y
 							#### disallow remote login -y
