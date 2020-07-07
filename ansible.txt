@@ -142,5 +142,5 @@ $ ansible web -b -K -m apt -a 'name=htop state=absent' ( state=absent, uninstall
 
 ## first try to learn
 -> Hosts ( inventory ) setup
--> ad-hoc ansible commands(-a "ls -lah". ad-hom command) 
+-> ad-hoc ansible commands(-a "ls -lah". ad-hoc command) 
 -> playbook
