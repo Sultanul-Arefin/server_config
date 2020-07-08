@@ -20,16 +20,21 @@
 -> Plugins
 
 
+## Ansible is simple open source IT engine which automates application deployment, intra service orchestration, cloud provisioning and many other IT tools.
+Ansible is easy to deploy because it does not use any agents or custom security infrastructure.
+
+
 # First Learn This: Hosts(inventory) setup, ad-hoc command, playbook
 
-(i) Installation:
+
+(i) 												******Installation:******
 
 -> Need to install python
+-> sudo apt-get install python-software-properties  (got it in another tut)-> sudo apt-get install software-properties-common 
 -> sudo apt-add-repository -y ppa:ansible/ansible
 -> sudo apt-get update
 -> sudo apt-get install -y ansible
 
--> if got any error due to python software repository, sudo apt-get install python-software-properties
 
 -> ansible --version
 
@@ -43,38 +48,50 @@
 
 
 
-(ii) Inventory
+(ii) 												******Inventory******
 
+
+-> inventory file provides the list of hosts where the ansible modules needs to be run 
 -> /etc/ansible ( can configure in any place )
 -> have file named ansible.cfg, & hosts.
 
 -> setup a hosts & try ansible with
 -> ansible hostname_in_hosts -m ping (check with ping)
+-> ansible hostname_in_hosts -i inventory -m ping ( if custome inventory )
+
+
+
+
+
+(iii) 											******Ad-Hoc Command******
+
+
+-> ansible -i hosts -m ping ( define playbook by -i with location )
+
+## Some Command ( suppose we've a hosts named web, db )
+$ ansible all -a 'ls -lah /'
+$ ansible web -a 'tail /var/log/auth.log'
+$ ansible all -m ping ( ping module )( ping all the servers )
+$ ansible all -m copy -a 'src=/tmp/file.txt dest=/tmp/c_file.txt' ( copy module )
+$ ansible all -m shell -a 'ls -lah /tmp' ( shell module )
+$ ansible web -b -K -m apt -a 'name=htop state=present' ( apt module ) ( state=present, installation )
+$ ansible web -b -K -m apt -a 'name=htop state=absent' ( state=absent, uninstallation )
 
 -> ansible all -a "free -m" ( to all hosts memory )
-
 -> ansible all -a "free -m" -u sultan (can use -u tag for username)
-
-## check all hostname & others with command
-
 -> ansible -m shell -a 'hostname' all ( shell module, a for command )
 -> ansible -m shell -a 'df -h' all ( available disk space on the server )
 -> ansible -m shell -a 'whoami' all ( whoami command )
-
-## show created users of all servers
--> ansible -m shell -a 'getent passwd | grep testuser' all
-
-## deleted users that was created
--> ansible -b -K -m user -a 'name=testuser state=absent' all
+-> ansible -m shell -a 'getent passwd | grep testuser' all ( show created users of all servers )
+-> ansible -b -K -m user -a 'name=testuser state=absent' all ( deleted users that was created )
 
 
 
 
+(iv) 												******Playbook(shortly)******
 
-(iii) Playbook(shortly)
 
 -> vim playbook.yml
-
 ---
 - hosts: all
   tasks: 
@@ -123,7 +140,6 @@ $ vim create_file.yml
       name: "create a dummy file on webser"
       command: touch /tmp/ansible_dummy.txt
 
-## run a ansible playbook
 $ ansible-playbook create_file.yml -i inventory.txt ( define inventory too, cause we're not using default inventory )
 
 
@@ -160,15 +176,3 @@ $ ansible-playbook -K playbook.yml
 
 
 
-(iv) Ad-Hoc Command
-
--> ansible -i hosts -m ping ( define playbook by -i with location )
-
-## Some Command ( suppose we've a hosts named web, db )
-$ ansible all -a 'ls -lah /'
-$ ansible web -a 'tail /var/log/auth.log'
-$ ansible all -m ping ( ping module )( ping all the servers )
-$ ansible all -m copy -a 'src=/tmp/file.txt dest=/tmp/c_file.txt' ( copy module )
-$ ansible all -m shell -a 'ls -lah /tmp' ( shell module )
-$ ansible web -b -K -m apt -a 'name=htop state=present' ( apt module ) ( state=present, installation )
-$ ansible web -b -K -m apt -a 'name=htop state=absent' ( state=absent, uninstallation )
