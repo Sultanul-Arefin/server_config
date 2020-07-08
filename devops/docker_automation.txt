@@ -1,10 +1,11 @@
-****Docker****
+														****Docker****
 
 # Docker is a tool designed to make it easier to deploy and run applications by using containers.
 # Container allow a developer to package up an application with all of the parts it needs, such as libraries and other dependencies, and ship it all out as one package.
 # stack ( স্তূপ, গাঁঘা )
 
-**** Docer Architecture ****
+
+													**** Docer Architecture ****
 
 # DockerFile( describes steps to create a Docker image. It's like a recipe with all ingredients and steps necessary in making your dish )
 
@@ -22,7 +23,9 @@ Containerization: Host OS -> Container Engine -> lib / bins (dependencies ) -> A
 
 # Dockerfile, Docker Image, Docker Containers, Docker Hub/Registry, Docker Client, Docker Server(Daemon), Docker Engine
 
-**** Play with Docker ****
+
+													**** Play with Docker ****
+
 -> https://labs.play-with-docker.com
 
 **** Installation on Linux ****
@@ -40,7 +43,8 @@ Containerization: Host OS -> Container Engine -> lib / bins (dependencies ) -> A
 # docker run image_name (hello_world)( to run a image. if image is not available locally, it'll be pulled from repository )
 # service docker stop ( to stop docker )
 
-**** Basic Commands ****
+
+												**** Basic Commands ****
 
 # Basic
 > docker version ( info about docker client & server )
@@ -68,7 +72,7 @@ Containerization: Host OS -> Container Engine -> lib / bins (dependencies ) -> A
 -> docker system prune -a ( remove all unused container, images etc )
 
 
-**** Docer Images ****
+												**** Docer Images ****
 
 # Docker Image are templates used to create docker containers
 # Container is a running instance of image
@@ -89,7 +93,7 @@ Containerization: Host OS -> Container Engine -> lib / bins (dependencies ) -> A
 # note: image typically contains a union of layered filesystems stacked on top of each other )
 
 
-**** Containers ****
+												**** Containers ****
 
 # Containers are running instances of Docker Images
 
@@ -112,7 +116,7 @@ Containerization: Host OS -> Container Engine -> lib / bins (dependencies ) -> A
 > docker history ImageName/Id ( history of a particular image )
 
 
-**** Run Jenkins On Docker ****
+												**** Run Jenkins On Docker ****
 
 # set jenkins home on Docker volume and host machine ( see later )
 
@@ -134,7 +138,7 @@ Containerization: Host OS -> Container Engine -> lib / bins (dependencies ) -> A
 
 
 
-**** Docker File ****
+												**** Docker File ****
 
 
 # Dockerfile: A text file with instructions to build image
@@ -160,8 +164,7 @@ CMD ["echo", "Hello world....!from first docker image] # if we want to run somet
 > docker build -t myimage1:1.0 . ( tag an image )
 
 
-
-**** Docker Compose *****
+												**** Docker Compose *****
 
 # what | why
 # Installation
@@ -208,7 +211,7 @@ services:
 -> docker-compose up -d --scale database=4 ( database 4 instances )
 
 
-**** Docker Volume, How to Create Volumes, What is Bind Mount, Docker Storage ****
+						**** Docker Volume, How to Create Volumes, What is Bind Mount, Docker Storage ****
 
 # volumes
 # create, list, delete
@@ -247,7 +250,7 @@ services:
 -> docker run --name MyJenkins3 -v /home/sultan/Jenkins_Home:/var/jenkins_home -p 9191:8080 -p 40000:50000 jenkins ( a new instance )
 
 
-**** Docker Swarm ****
+														**** Docker Swarm ****
 
 # Docker Swarm
 # Why to use

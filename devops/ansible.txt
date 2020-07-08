@@ -20,100 +20,73 @@
 -> Plugins
 
 
-##########
-### Lab Setup
--> ssh for linux machine
--> winrm for windows machine
+# First Learn This: Hosts(inventory) setup, ad-hoc command, playbook
 
--> vim /etc/ansible/hosts ( add in this file )
-192.168.122.54 ansible_ssh_pass=password
-:wq
+(i) Installation:
+
+-> Need to install python
+-> sudo apt-add-repository -y ppa:ansible/ansible
+-> sudo apt-get update
+-> sudo apt-get install -y ansible
+
+-> if got any error due to python software repository, sudo apt-get install python-software-properties
+
+-> ansible --version
+
+-> Ansible assumes you're using passwordless(key-based) login for SSH.
+
+-> ssh-copy-id username@ip ( for key-based ssh )
 
 -> default user => root, connection => ssh
 
--> host_key_checking = False ( /etc/ansible/hosts )
-
--> sudo apt install sshpass -y
-
-## let's ping in to our ip from controller machine
--> ansible 192.168.122.54 -m ping ( m=module )
 
 
-##### another way
--> create a folder & file
-$ sudo vim /etc/ansible/inventory/inventory.txt
-$ vim inventory.txt
-webserver1 ansible_host=192.168.122.54 ansible_ssh_pass=password ansible_connection=ssh ansible_port=22 ansible_user=sultan
-
-## let's ping
--> ansible webserver1 -m ping -i /etc/ansible/inventory/invetory.txt( we've define the file or path of the file )( i => changing default entry file )
 
 
-## 2 server
+(ii) Inventory
 
-webserver1 ansible_host=192.168.122.54 ansible_ssh_pass=password ansible_connection=ssh ansible_port=22 ansible_user=sultan
-mysqlserver1 ansible_host=192.168.122.55 ansible_ssh_pass=password ansible_connection=ssh ansible_port=22 ansible_user=sultan
+-> /etc/ansible ( can configure in any place )
+-> have file named ansible.cfg, & hosts.
 
-let's ping
+-> setup a hosts & try ansible with
+-> ansible hostname_in_hosts -m ping (check with ping)
 
-$ ansible mysqlserver1 -m ping -i /etc/ansible/inventory/invetory.txt( we've define the file or path of the file )( i => changing default entry file )
+-> ansible all -a "free -m" ( to all hosts memory )
 
-$ ansible all -m ping -i inventory.txt
+-> ansible all -a "free -m" -u sultan (can use -u tag for username)
 
-$ webserver* ( with wildcard, ping all starting with webserver )
+## check all hostname & others with command
 
-##  groups
--> add records first.
--> then, create groups
+-> ansible -m shell -a 'hostname' all ( shell module, a for command )
+-> ansible -m shell -a 'df -h' all ( available disk space on the server )
+-> ansible -m shell -a 'whoami' all ( whoami command )
 
-[webservers]
-webserver1
-webserver2
-webserver3
-webserver4
+## show created users of all servers
+-> ansible -m shell -a 'getent passwd | grep testuser' all
 
-[mysqlservers]
-mysqlserver1
-mysqlserver2
-mysqlserver3
-mysqlserver4
-
--> ansible mysqlservers -m ping -i inventory.txt
+## deleted users that was created
+-> ansible -b -K -m user -a 'name=testuser state=absent' all
 
 
-##############
-## Ansible playbook
--> inventory file like above
--> playbook
-$ vim playbook.yml
--
-  name: this is our first play
-  hosts: webservers
+
+
+
+(iii) Playbook(shortly)
+
+-> vim playbook.yml
+
+---
+- hosts: all
   tasks: 
-    - 
-      name: "create a dummy file on webser"
-      command: touch /tmp/ansible_dummy.txt
+  - name: Ensure NTP(for time synchronization) is installed
+    apt: name=ntp state=latest
+  -name: Ensure NTP is running
+    service: name=ntp state=started enabled=yes
 
-## run a ansible playbook
-$ ansible-playbook playbook.yml -i inventory.txt ( define inventory too, cause we're not using default inventory )
-
-
+-> ansible-playbook -b -K playbook.yml ( give password to run )
 
 
-
-
-
-##############
-## Some Command ( suppose we've a hosts named web, db )
-$ ansible all -a 'ls -lah /'
-$ ansible web -a 'tail /var/log/auth.log'
-$ ansible all -m ping ( ping module )( ping all the servers )
-$ ansible all -m copy -a 'src=/tmp/file.txt dest=/tmp/c_file.txt' ( copy module )
-$ ansible all -m shell -a 'ls -lah /tmp' ( shell module )
-$ ansible web -b -K -m apt -a 'name=htop state=present' ( apt module ) ( state=present, installation )
-$ ansible web -b -K -m apt -a 'name=htop state=absent' ( state=absent, uninstallation )
-
-### installing apache2 in debina
+-> vim apache_in_debian.yml( installing apache2 in debian )
 --- # Infrastructure demo
 - hosts: ubuntu
   remote_user: sultan
@@ -138,9 +111,64 @@ $ ansible web -b -K -m apt -a 'name=htop state=absent' ( state=absent, uninstall
       name: apache2
       state: restarted
 
+-> ansible-playbook -b -K apache_in_debian.yml
 
 
-## first try to learn
--> Hosts ( inventory ) setup
--> ad-hoc ansible commands(-a "ls -lah". ad-hoc command) 
--> playbook
+$ vim create_file.yml
+-
+  name: this is our first play
+  hosts: webservers
+  tasks: 
+    - 
+      name: "create a dummy file on webser"
+      command: touch /tmp/ansible_dummy.txt
+
+## run a ansible playbook
+$ ansible-playbook create_file.yml -i inventory.txt ( define inventory too, cause we're not using default inventory )
+
+
+-> vim playbook.yml
+- name: "Installing dns-utils"
+  apt: pkg=dnsutils state=latest
+
+- name: "Installing GIT"
+  apt: pkg=git state=latest
+
+-> ansible-playbook -K playbook.yml
+
+
+## install list of packages, instead of define frequentyly
+- name: "Installing packages"
+  apt: pkg={{ item }} state=latest
+  with_items:
+  - vim
+  - dnsutils
+  - git
+  - ntp
+  - at
+  - lvm2
+
+## copy 
+
+- name: "Adding bashrc"
+  copy: src=../files/bash.bashrc dest=/etc/bash.bashrc owner=root group=root mode=0644
+
+- name: "Removing sultan bashrc"
+  shell: creates=/home/sultan/.bashrc_backup mv /home/sultan/.bashrc /home/sultan/.bashrc_backup
+
+$ ansible-playbook -K playbook.yml
+
+
+
+(iv) Ad-Hoc Command
+
+-> ansible -i hosts -m ping ( define playbook by -i with location )
+
+## Some Command ( suppose we've a hosts named web, db )
+$ ansible all -a 'ls -lah /'
+$ ansible web -a 'tail /var/log/auth.log'
+$ ansible all -m ping ( ping module )( ping all the servers )
+$ ansible all -m copy -a 'src=/tmp/file.txt dest=/tmp/c_file.txt' ( copy module )
+$ ansible all -m shell -a 'ls -lah /tmp' ( shell module )
+$ ansible web -b -K -m apt -a 'name=htop state=present' ( apt module ) ( state=present, installation )
+$ ansible web -b -K -m apt -a 'name=htop state=absent' ( state=absent, uninstallation )
