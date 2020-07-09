@@ -1,30 +1,22 @@
-# topics
--> Introduction to Ansible and lab setup
--> Ansible Inventory files
--> Ansible Playbook
--> Variables
--> Conditions
--> Loops
--> Roles
--> Preparing windows server
-
-# Advance topics
--> Ansible galaxy
--> Asynchronous action
--> Error Handling
--> Jinja2 templating
--> Lookups
--> Vaults
--> Dynamic Inventory
--> Custom module
--> Plugins
 
 
 ## Ansible is simple open source IT engine which automates application deployment, intra service orchestration, cloud provisioning and many other IT tools.
 Ansible is easy to deploy because it does not use any agents or custom security infrastructure.
 
+• It support configuration management with examples as below.
+	• Configuration of servers
+	• Application deployment
+	• Continuous testing of already install application
+	• Provisioning
+	• Orchestration
+	• Automation of tasks
+
 
 # First Learn This: Hosts(inventory) setup, ad-hoc command, playbook
+
+
+
+
 
 
 (i) 												******Installation:******
@@ -45,13 +37,36 @@ Ansible is easy to deploy because it does not use any agents or custom security 
 -> default user => root, connection => ssh
 
 
+## Modules: apt/yum, copy, file, get_url, git, ping, debug, service, sysncfronize, template etc
+
+-> ansible-doc -l (all modules)
+-> ansible-doc copy ( description about copy module )
+
+* command: takes the command and executes on the host. The most secure and predictable
+* shell: executes through a shell like /bin/sh so you can use pipes etc.
+* script: Runs a local script on a remote node after transferring it.
+* raw: executes a command without going through the ansible module subsystem.
+
+
+# Requirement for installation
+• Install packages below on the Server Machine
+• sudo apt-get install python-yaml python-jinja2 python-paramiko
+python-crypto python-keyczar ansible
+• Install packages below on the client Machines
+• sudo apt-get install python-crypto python-keyczar
+
+
+
 
 
 
 (ii) 												******Inventory******
 
 
--> inventory file provides the list of hosts where the ansible modules needs to be run 
+-> inventory file provides the list of hosts(nodes) where the ansible modules needs to be run 
+
+## Hosts(nodes), groups, Inventory-specific data(variables), static or dynamic sources
+
 -> /etc/ansible ( can configure in any place )
 -> have file named ansible.cfg, & hosts.
 
@@ -63,19 +78,37 @@ Ansible is easy to deploy because it does not use any agents or custom security 
 
 
 
+
 (iii) 											******Ad-Hoc Command******
 
 
+# An ad-hoc command is a single Ansible task to perform quickly, but don’t want
+to save for later.
+
+-> ansible all -m setup (gathering facts, facts can be used for implementing conditional statements in playbook.)
+-> ansible ubuntu_1 -m setup ( discovered facts )
+
 -> ansible -i hosts -m ping ( define playbook by -i with location )
+-> ansible ububntu_all -i inventory/hosts -a "reboot" 
+-> ansible ubuntu_2 -i inventory/hosts -a "reboot" -u fahim ( define username )
+
+-> ansible all -m command -a "uptime"
 
 ## Some Command ( suppose we've a hosts named web, db )
+
 $ ansible all -a 'ls -lah /'
 $ ansible web -a 'tail /var/log/auth.log'
 $ ansible all -m ping ( ping module )( ping all the servers )
 $ ansible all -m copy -a 'src=/tmp/file.txt dest=/tmp/c_file.txt' ( copy module )
 $ ansible all -m shell -a 'ls -lah /tmp' ( shell module )
+$ ansible all -m file -a "dest=/path/new mode=777 owner=user1 group=user1 state=directory" ( creating new directory )
+$ ansible all -m file -a "dest=/path/to/delete state=absent" ( deleting whole directory & files )
+
+## managing packages
+
 $ ansible web -b -K -m apt -a 'name=htop state=present' ( apt module ) ( state=present, installation )
 $ ansible web -b -K -m apt -a 'name=htop state=absent' ( state=absent, uninstallation )
+$ ansible web -b -K -m apt -a 'name=htop state=latest' ( state=latest, check if the latest package is installed)
 
 -> ansible all -a "free -m" ( to all hosts memory )
 -> ansible all -a "free -m" -u sultan (can use -u tag for username)
@@ -88,26 +121,54 @@ $ ansible web -b -K -m apt -a 'name=htop state=absent' ( state=absent, uninstall
 
 
 
+
+
 (iv) 												******Playbook(shortly)******
 
+##Plays are ordered sets of tasks to execute against host selections from your
+inventory. A playbook is a file containing one or more plays.
 
--> vim playbook.yml
+
+### install_start_apache.yml
+---
+- name: install and start apahce
+  hosts: ubuntu_1
+  become: yes
+  vars:
+    http_port: 80
+
+  tasks:
+  - name: apache2 package is present
+    apt:
+      name: apache2
+      state: latest
+
+  - name: latest index.html file is present
+    copy:
+      src: files/index.html
+      dest: /var/www/html/
+
+
+### vim playbook.yml
 ---
 - hosts: all
   tasks: 
   - name: Ensure NTP(for time synchronization) is installed
     apt: name=ntp state=latest
   -name: Ensure NTP is running
-    service: name=ntp state=started enabled=yes
+    service: 
+      name=ntp 
+      state=started 
+      enabled=yes # we can run it this way too
 
 -> ansible-playbook -b -K playbook.yml ( give password to run )
 
 
--> vim apache_in_debian.yml( installing apache2 in debian )
+### vim apache_in_debian.yml( installing apache2 in debian )
 --- # Infrastructure demo
 - hosts: ubuntu
   remote_user: sultan
-  become: yes
+  sudo: yes
   become_method: sudo
   connection: ssh
   gather_facts: yes
@@ -130,8 +191,14 @@ $ ansible web -b -K -m apt -a 'name=htop state=absent' ( state=absent, uninstall
 
 -> ansible-playbook -b -K apache_in_debian.yml
 
+## Handler Tasks=> Handlers are special tasks that run at the end of a play if notified by another task when a change occurs.
+If a configuration file gets changed notify a service restart task that it need to run.
+-> Handlers are triggered when something changes
+e.g. restart daemon when a confg fle is changed
 
-$ vim create_file.yml
+
+
+### vim create_file.yml
 -
   name: this is our first play
   hosts: webservers
@@ -143,7 +210,7 @@ $ vim create_file.yml
 $ ansible-playbook create_file.yml -i inventory.txt ( define inventory too, cause we're not using default inventory )
 
 
--> vim playbook.yml
+### vim playbook.yml
 - name: "Installing dns-utils"
   apt: pkg=dnsutils state=latest
 
@@ -153,7 +220,7 @@ $ ansible-playbook create_file.yml -i inventory.txt ( define inventory too, caus
 -> ansible-playbook -K playbook.yml
 
 
-## install list of packages, instead of define frequentyly
+### install list of packages, instead of define frequentyly
 - name: "Installing packages"
   apt: pkg={{ item }} state=latest
   with_items:
@@ -164,7 +231,7 @@ $ ansible-playbook create_file.yml -i inventory.txt ( define inventory too, caus
   - at
   - lvm2
 
-## copy 
+### copy 
 
 - name: "Adding bashrc"
   copy: src=../files/bash.bashrc dest=/etc/bash.bashrc owner=root group=root mode=0644
@@ -175,4 +242,123 @@ $ ansible-playbook create_file.yml -i inventory.txt ( define inventory too, caus
 $ ansible-playbook -K playbook.yml
 
 
+### install_htop
+-> vim install_htop.yml
+---
+- hosts: ubuntu_all
+  become: yes
 
+  tasks:
+  - name: Ensure htop is installed correctly
+    apt: name=htop state=present
+
+$ ansible-playbook install_htop.yml -u root ( if you're login from another host in control machine, you've to define host)
+$ ansible-playbook -b -K install_htop.yml ( if you're login from account which is not root, and have same account in remote machine, you've to define -b -K to become root )
+
+
+
+## Here are some more essential playbook features that we can apply:
+* Templates
+* Loops
+* Conditionals
+* Tags
+* Blocks
+
+# Templates: Ansible embeds the Jinja2 templating engine that can be used to dynamically:
+-> Set and modify play variables
+-> Conditional logic
+-> Generate files such as configuration from variables
+
+# Loops: Loops can do one task on multiple things, such as create a lot of users, install a lot of packages, or repeat a polling step until a certain result is reached.
+
+- apt:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+  - apache2
+  - mod_wsgi
+
+# Conditionals: Ansible supports the conditional execution of a task based on the run-time evaluation of variable, fact, or previous task result.
+
+- apt:
+    name: apache2
+    state: latest
+  when: ansible_os_family == "Debian"
+
+# Tags: Tags are useful to be able to run a subset of a playbook on-demand.
+
+- apt:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+  - apache2
+  - mod_wsgi
+  tags:
+    - packages
+
+  - template:
+      src: templates/apache2/apache2.conf.j2
+      dest: /etc/apache2/conf/apache2.conf
+  tags:
+    - configuration
+
+# Blocks: Blocks cut down on repetitive task directives, allow for logical grouping of tasks and even in play error handling.
+
+- block:
+  - apt:
+      name: "{{ item }}"
+      state: latest
+    with_items:
+    - apache2
+    - mod_wsgi
+
+  - template:
+    src: templates/apache2.conf.j2
+    dest: /etc/apache2/conf/apache2.conf
+  when: ansible_os_family == "Debian"
+
+
+
+
+
+
+
+(v) 											******Roles******
+
+## In Ansible, the role is the primary mechanism for breaking a playbook into multiple files. Roles are not playbooks. Roles are small functionality which can be independently used but have to be used within playbooks.
+
+=> Creating a new role
+# Each role is directory tree in itself. The role name is the directory name within the /roles directory
+-> ansible-galaxy -h
+
+Usage:
+-> ansible-galaxy [delete|import|info|init|install|list|login|remove|search|setup] [--help] [options] ... 
+
+=> Creating a Role directory
+-> ansible-galaxy init sultanrole
+Or, ansible-galaxy init --force --offline sultan ( if error occured in previously )
+
+
+
+
+
+
+									****** Variables ******
+
+## Ansible can work with metadata from various sources and manage their context in the form of variables.
+* Command line parameters
+* Plays & tasks
+* files
+* inventory
+* discovered facts
+* roles
+
+# Tasks: Tasks are the application of a module to perform a specific unit of work.
+* file: A directory should exist
+* yum/apt: A package should be installed
+* service: A service should be running
+* template: Render a configuration file from a template
+* get_url: Fetch an archive file from a URL
+* git: Clone a source code repository 
+
+## examples are in playbook section

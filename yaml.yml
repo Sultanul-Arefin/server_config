@@ -27,11 +27,14 @@ person:
   male: true # boolean
   birthday: 1994-02-06 14:33:22 # ISO 8601
   flaws: null
-  hobbies:
+
+  hobbies:    ## list items  or, list items in dictionary
     - hiking
     - movies
-    - riding bike # list items
+    - riding bike 
+  
   movies: ["a","b","c", "good will hunting"] # hobbies, movies are equivalent. they're list
+  
   friends:  # list of objects
     - name: "fahim"
       age: 22
@@ -51,4 +54,86 @@ person:
     
 
 # -> can access by person.name
+
+
+
+
+
+
+
+
+
+
+
+
+# Same example again
+
+---
+fahim: 
+  name: sultan 
+  roll: 39 
+  div: A 
+  sex: male
+
+# abbreviation
+
+fahim: {name: sultan, roll: 39, div: A, sex: male}
+
+# Representing List
+
+countries: 
+ - Bangladesh
+ - Pakistan
+ - Uruguay
+ - Chile
+
+# abbrebiation
+
+countries: ['Bangladesh', 'Pakistan', 'Uruguay', 'Chile']
+
+# List inside dictionaries
+data:
+  name: arefin
+  roll: 39
+  div: A
+  sex: male
+  hobbies:
+   - football
+   - cricket
+   - etc
+
+# List of dictionaries
+
+- fahim:
+    name: fahim
+    roll: 39
+    div: A
+    sex: male
+    hobbies:
+      - football
+      - cricket
+      - etc
+
+- sultan:
+    name: sultan
+    roll: 39
+    div: A
+    sex: male
+    hobbies:
+      - cricket
+      - football
+      - etc
+
+
+# YAML uses "|" to include newlines while showing multiple lines and 
+# ">" to supress newlines while showing multiple lines.
+
+messageIncludeNewLines: |
+    Congratulation!!
+    You Passed with 79%
+
+messageExcludeNewLines: >
+    Congratulation!!
+    You Passed with 79%
+
 
