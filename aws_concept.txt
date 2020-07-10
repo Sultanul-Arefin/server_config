@@ -1,0 +1,32 @@
+Cloud Computing Some Terminology: High Availability, Fault Tolerant, Scalability, Elasticity
+
+Users -> AWS -> VPC -> Amazon EC2(Compute Power), Amazon RDS(Databae)
+      -> Amazon S3(Storage)
+						
+	      -> VPC(Virtual Private Cloud)
+	        -> A Virtual Private Cloud is your private section of AWS, where you can place AWS resources, and allow/restrict access to them.
+
+		    -> EC2
+			-> Known as Elastic Cloud Compute
+			-> It's like a basic computer(or, instance which is a server)
+			-> basic computer consists of: CPU(Processing Power), OS, Hard Drive(Local Storage), Network Card(Internet), Firewall, RAM
+			-> It's like a web hosting server which is a virtual computer 
+			
+		    -> RDS
+			-> AWS provisioned database service
+			-> Database platform provided by Amazon
+			-> Customer account info, inventory catalog etc
+			-> When customer is very much high, amazon will automatically added extra ec2 as needed in vpc, & all ec2 are connected with same rds(scalibility)
+			-> when customers are gone, & no need to use extra ec2 amazon will automatically remove ec2 instances from vpc(elasticity)
+			-> EC2 could be accessed from anywhere, anytime ( high availability )
+			-> if any damaged occured in any ec2, it'll be automatically redirect to another ec2 ( fault tolerant)
+			-> after removing the damaged ec2, amazon will automatically create another ec2 & redirect users again in to the new ec2
+
+
+    -> Amazon S3(Storage)
+	-> It's like Large Unlimited Storage Bucket
+	-> Mass Storage
+	-> Long-term Storage
+
+
+AWS Region: Availability zone 1,2,3.... ( Data Center )

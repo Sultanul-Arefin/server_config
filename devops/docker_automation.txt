@@ -24,6 +24,16 @@ Containerization: Host OS -> Container Engine -> lib / bins (dependencies ) -> A
 # Dockerfile, Docker Image, Docker Containers, Docker Hub/Registry, Docker Client, Docker Server(Daemon), Docker Engine
 
 
+
+													
+													**** Install Docker ****
+
+---> https://docs.docker.com/engine/install/ubuntu/
+
+## I've successfully installed by using Repostitory
+
+
+
 													**** Play with Docker ****
 
 -> https://labs.play-with-docker.com
@@ -121,7 +131,7 @@ Containerization: Host OS -> Container Engine -> lib / bins (dependencies ) -> A
 # set jenkins home on Docker volume and host machine ( see later )
 
 > docker pull jenkins
-> docker run -p 8080:8080 -p 50000:50000 jenkins ( -p expose the port 8080 on the host system which corresponcse to 8080 port for the docker server ) ( exporting port 50000 for jenkins api ) ( image name is jenkins ) ( all the data will be lost when we delete the container with this command )
+> docker run -p 8080:8080 -p 50000:50000 jenkins ( -p expose the port 8080 on the host system which corresponces to 8080 port for the docker server ) ( exporting port 50000 for jenkins api ) ( image name is jenkins ) ( all the data will be lost when we delete the container with this command )
 
 # Persistent storage for Jenkins_Home
 > docker run -p 8080:8080 -p 50000:50000 -v /your/home:/var/jenkins_home jenkins ( --name MyJenkins1, running with a name )
